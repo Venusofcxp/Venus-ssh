@@ -6,7 +6,7 @@ RED="\e[31m"
 YELLOW="\e[33m"
 RESET="\e[0m"
 
-# Função para exibir o menu
+# Função do menu
 menu() {
     clear
     echo -e "${YELLOW}========= PAINEL DE GERENCIAMENTO =========${RESET}"
@@ -48,11 +48,11 @@ menu() {
     menu
 }
 
-# Criar o comando menu
-echo "menu() {" > /usr/local/bin/menu
-cat $0 >> /usr/local/bin/menu
-echo "}" >> /usr/local/bin/menu
-chmod +x /usr/local/bin/menu
+# Se for chamado com "menu", apenas executa o painel
+if [[ "$1" == "menu" ]]; then
+    menu
+    exit 0
+fi
 
 echo -e "${YELLOW}========= INSTALAÇÃO INICIADA =========${RESET}"
 echo -e "${GREEN}1. Atualizando sistema...${RESET}"
@@ -110,6 +110,13 @@ echo -e "${GREEN}7. Configurando firewall...${RESET}"
 sudo ufw allow $SSH_PORT/tcp
 sudo ufw allow $WS_PORT/tcp
 sudo ufw reload
+
+# Criar o comando "menu" para abrir o painel
+echo -e "${GREEN}8. Criando comando menu...${RESET}"
+echo '#!/bin/bash' | sudo tee /usr/local/bin/menu > /dev/null
+echo "bash <(curl -sL https://raw.githubusercontent.com/Venusofcxp/Venus-ssh/main/install-ssh-websocket-udp.sh) menu" | sudo tee -a /usr/local/bin/menu > /dev/null
+sudo chmod +x /usr/local/bin/menu
+sudo ln -sf /usr/local/bin/menu /usr/bin/menu
 
 IP=$(curl -s ifconfig.me)
 echo -e "${YELLOW}========= INSTALAÇÃO FINALIZADA =========${RESET}"
