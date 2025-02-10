@@ -1,81 +1,133 @@
 #!/bin/bash
+clear
 
-# Cores para destaque
-GREEN="\e[32m"
-RED="\e[31m"
-YELLOW="\e[33m"
-CYAN="\e[36m"
-WHITE="\e[97m"
-RESET="\e[0m"
+#--------------------------
+# GERENCIADOR SSH - VENUS PRO
+#--------------------------
 
-# Função para exibir o painel principal
-menu() {
-    clear
+# - Cores
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[1;34m'
+NC='\033[0m' # Sem cor
 
-    # Obtendo informações do sistema
-    OS=$(lsb_release -d | cut -f2-)
-    RAM_TOTAL=$(free -m | awk '/^Mem/ {print $2}')
-    RAM_USO=$(free -m | awk '/^Mem/ {print $3}')
-    CPU_CORES=$(nproc)
-    CPU_USO=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')
-    ONLINE=$(who | wc -l)
-    TOTAL_USERS=$(grep -c '^' /etc/passwd)
-    EXPIRED_USERS=$(find /etc/ -name "shadow" -exec awk -F: '($2=="!!"){print $1}' {} \; | wc -l)
-    HORA=$(date +"%T")
-
-    # Layout do painel
-    echo -e "${CYAN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${RESET}"
-    echo -e "${CYAN}┃               ⇱ VENUS PRO ⇲               ┃${RESET}"
-    echo -e "${CYAN}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫${RESET}"
-    echo -e "${CYAN}┃ SISTEMA           MEMORIA RAM       PROCESSADOR  ┃${RESET}"
-    echo -e "${CYAN}┃ OS: ${GREEN}$OS${CYAN}  Total: ${GREEN}${RAM_TOTAL}MB${CYAN}   Núcleos: ${GREEN}${CPU_CORES}${CYAN}    ┃${RESET}"
-    echo -e "${CYAN}┃ Hora: ${GREEN}${HORA}${CYAN}    Em Uso: ${GREEN}${RAM_USO}MB${CYAN}    CPU: ${GREEN}${CPU_USO}%${CYAN}    ┃${RESET}"
-    echo -e "${CYAN}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫${RESET}"
-    echo -e "${CYAN}┃ Onlines: ${GREEN}${ONLINE}${CYAN}        Expirados: ${GREEN}${EXPIRED_USERS}${CYAN}      Total: ${GREEN}${TOTAL_USERS}${CYAN}      ┃${RESET}"
-    echo -e "${CYAN}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫${RESET}"
-
-    echo -e "${CYAN}┃ [${RED}01${RESET}] • CRIAR USUÁRIO        [${RED}13${RESET}] • SPEEDTEST     ┃${RESET}"
-    echo -e "${CYAN}┃ [${RED}02${RESET}] • CRIAR TESTE          [${RED}14${RESET}] • OTIMIZAR      ┃${RESET}"
-    echo -e "${CYAN}┃ [${RED}03${RESET}] • REMOVER USUÁRIO      [${RED}15${RESET}] • TRÁFEGO       ┃${RESET}"
-    echo -e "${CYAN}┃ [${RED}04${RESET}] • RENOVAR USUÁRIO      [${RED}16${RESET}] • FIREWALL      ┃${RESET}"
-    echo -e "${CYAN}┃ [${RED}05${RESET}] • USUÁRIOS ONLINE      [${RED}17${RESET}] • INFO SISTEMA  ┃${RESET}"
-    echo -e "${CYAN}┃ [${RED}06${RESET}] • ALTERAR DATA         [${RED}18${RESET}] • BANNER        ┃${RESET}"
-    echo -e "${CYAN}┃ [${RED}07${RESET}] • ALTERAR LIMITE       [${RED}19${RESET}] • LIMITAR SSH   ┃${RESET}"
-    echo -e "${CYAN}┃ [${RED}08${RESET}] • ALTERAR SENHA        [${RED}20${RESET}] • BADVPN        ┃${RESET}"
-    echo -e "${CYAN}┃ [${RED}09${RESET}] • REMOVER EXPIRADOS    [${RED}21${RESET}] • AUTO MENU     ┃${RESET}"
-    echo -e "${CYAN}┃ [${RED}10${RESET}] • RELATÓRIO USUÁRIOS   [${RED}22${RESET}] • BOT TELEGRAM  ┃${RESET}"
-    echo -e "${CYAN}┃ [${RED}11${RESET}] • BACKUP DE USUÁRIOS   [${RED}23${RESET}] • FERRAMENTAS   ┃${RESET}"
-    echo -e "${CYAN}┃ [${RED}12${RESET}] • MODO DE CONEXÃO      [${RED}00${RESET}] • SAIR          ┃${RESET}"
-    echo -e "${CYAN}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${RESET}"
-    
-    echo -n -e "${CYAN}┗┫ INFORME UMA OPÇÃO: ${RESET}"
-    
-    read opcao
-
-    case $opcao in
-        1) echo -e "${GREEN}Criando usuário SSH...${RESET}";;
-        2) echo -e "${GREEN}Criando teste SSH...${RESET}";;
-        3) echo -e "${GREEN}Removendo usuário SSH...${RESET}";;
-        4) echo -e "${GREEN}Renovando usuário SSH...${RESET}";;
-        5) echo -e "${GREEN}Listando usuários online...${RESET}";;
-        0) echo -e "${GREEN}Saindo...${RESET}"; exit 0;;
-        *) echo -e "${RED}Opção inválida!${RESET}"; sleep 2; menu;;
-    esac
-
-    sleep 2
-    menu
+# - Verifica Execução Como Root
+[[ "$EUID" -ne 0 ]] && {
+    echo -e "${RED}[x] ESTE SCRIPT DEVE SER EXECUTADO COMO ROOT!${NC}"
+    exit 1
 }
 
-# Se for chamado com "menu", apenas executa o painel
-if [[ "$1" == "menu" ]]; then
-    menu
-    exit 0
-fi
+# - Função para obter status do sistema
+status_servidor() {
+    cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')%
+    ram_usage=$(free -m | awk 'NR==2{printf "%.2f%", $3*100/$2 }')
+    usuarios_online=$(who | wc -l)
+    conexoes_ativas=$(netstat -tan | grep ':22 ' | grep ESTABLISHED | wc -l)
+}
 
-# Criar o comando menu globalmente
-echo '#!/bin/bash' | sudo tee /usr/local/bin/menu > /dev/null
-echo "bash <(curl -sL https://raw.githubusercontent.com/Venusofcxp/Venus-ssh/main/install-ssh-websocket-udp.sh) menu" | sudo tee -a /usr/local/bin/menu > /dev/null
-sudo chmod +x /usr/local/bin/menu
-sudo ln -sf /usr/local/bin/menu /usr/bin/menu
+# - Exibir painel VENUS PRO
+mostrar_painel() {
+    clear
+    status_servidor
+    echo -e "${BLUE}========================================${NC}"
+    echo -e "          🌟 ${YELLOW}VENUS PRO${NC} 🌟        "
+    echo -e "${BLUE}========================================${NC}"
+    echo -e ""
+    echo -e "📊 ${GREEN}Status do Servidor:${NC}"
+    echo -e "${BLUE}----------------------------------------${NC}"
+    echo -e "🖥️ CPU: ${YELLOW}$cpu_usage${NC}   |  📈 RAM: ${YELLOW}$ram_usage${NC}"
+    echo -e "🌐 Usuários Online: ${YELLOW}$usuarios_online${NC}"
+    echo -e "📡 Conexões Ativas: ${YELLOW}$conexoes_ativas${NC}"
+    echo -e "${BLUE}----------------------------------------${NC}"
+    echo -e ""
+    echo -e "📌 ${GREEN}MENU PRINCIPAL:${NC}"
+    echo -e "${BLUE}----------------------------------------${NC}"
+    echo -e "[${YELLOW}1${NC}] 🛠️ Gerenciar Usuários"
+    echo -e "[${YELLOW}2${NC}] 🔌 Configurações de Rede"
+    echo -e "[${YELLOW}3${NC}] 📶 Status da Conexão"
+    echo -e "[${YELLOW}4${NC}] ⚙️ Ferramentas Extras"
+    echo -e "[${YELLOW}5${NC}] 📜 Logs e Registros"
+    echo -e "[${YELLOW}6${NC}] 🏆 Estatísticas"
+    echo -e "[${YELLOW}7${NC}] 🖥️ Monitoramento"
+    echo -e "[${YELLOW}8${NC}] 🔄 Reiniciar Servidor"
+    echo -e "[${YELLOW}9${NC}] ❌ Sair"
+    echo -e "${BLUE}----------------------------------------${NC}"
+    echo -e "💡 ${YELLOW}Dica: Digite o número da opção desejada.${NC}"
+}
 
-echo -e "${GREEN}Instalação concluída! Digite 'menu' para abrir o painel.${RESET}"
+# - Funções do Gerenciador SSH
+criar_usuario() {
+    read -p "Nome do usuário SSH: " usuario
+    read -p "Senha: " senha
+    read -p "Dias de validade: " dias
+    expira=$(date -d "+$dias days" +"%Y-%m-%d")
+    useradd -m -s /bin/false -e "$expira" "$usuario"
+    echo "$usuario:$senha" | chpasswd
+    echo -e "${GREEN}[✔] Usuário SSH '$usuario' criado com sucesso! Expira em: $expira.${NC}"
+}
+
+remover_usuario() {
+    read -p "Nome do usuário SSH para remover: " usuario
+    userdel -r "$usuario" && echo -e "${GREEN}[✔] Usuário '$usuario' removido com sucesso.${NC}" || echo -e "${RED}[x] Usuário não encontrado.${NC}"
+}
+
+listar_usuarios() {
+    echo -e "${YELLOW}Usuários SSH Ativos:${NC}"
+    awk -F: '{if ($3 >= 1000) print $1}' /etc/passwd
+}
+
+ver_conexoes() {
+    echo -e "${YELLOW}Conexões Ativas:${NC}"
+    netstat -tnpa | grep ':22 ' | grep 'ESTABLISHED'
+}
+
+configurar_ssh() {
+    read -p "Nova porta SSH (padrão: 22): " nova_porta
+    read -p "Número máximo de conexões por usuário (padrão: 2): " max_conexoes
+    [[ -z "$nova_porta" ]] && nova_porta=22
+    [[ -z "$max_conexoes" ]] && max_conexoes=2
+    sed -i "s/^Port .*/Port $nova_porta/" /etc/ssh/sshd_config
+    sed -i "s/^MaxSessions .*/MaxSessions $max_conexoes/" /etc/ssh/sshd_config
+    sed -i "s/^MaxAuthTries .*/MaxAuthTries 2/" /etc/ssh/sshd_config
+    systemctl restart ssh
+    echo -e "${GREEN}[✔] Configuração SSH aplicada! Porta: $nova_porta | Máx Conexões: $max_conexoes.${NC}"
+}
+
+reiniciar_servidor() {
+    echo -e "${RED}[!] Reiniciando servidor...${NC}"
+    sleep 2
+    reboot
+}
+
+# - Loop do Menu Principal
+while true; do
+    mostrar_painel
+    read -p "Escolha uma opção: " opcao
+
+    case "$opcao" in
+        1) 
+            clear
+            echo -e "${GREEN}[1] Criar Usuário SSH${NC}"
+            echo -e "${GREEN}[2] Remover Usuário SSH${NC}"
+            echo -e "${GREEN}[3] Listar Usuários SSH${NC}"
+            read -p "Escolha uma opção: " sub_opcao
+            case "$sub_opcao" in
+                1) criar_usuario ;;
+                2) remover_usuario ;;
+                3) listar_usuarios ;;
+                *) echo -e "${RED}[x] Opção inválida!${NC}" ;;
+            esac
+            ;;
+        2) configurar_ssh ;;
+        3) ver_conexoes ;;
+        4) echo -e "${YELLOW}[!] Em desenvolvimento...${NC}" ;;
+        5) echo -e "${YELLOW}[!] Em desenvolvimento...${NC}" ;;
+        6) echo -e "${YELLOW}[!] Em desenvolvimento...${NC}" ;;
+        7) echo -e "${YELLOW}[!] Em desenvolvimento...${NC}" ;;
+        8) reiniciar_servidor ;;
+        9) echo -e "${GREEN}Saindo...${NC}"; exit ;;
+        *) echo -e "${RED}[x] Opção inválida!${NC}" ;;
+    esac
+    read -p "Pressione ENTER para continuar..."
+done
