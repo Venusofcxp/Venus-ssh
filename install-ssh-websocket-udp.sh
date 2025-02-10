@@ -18,10 +18,14 @@ NC='\033[0m' # Sem cor
     exit 1
 }
 
+# - Instala dependências
+apt update -y && apt install -y bc sysstat procps net-tools
+
 # - Função para obter status do sistema
 status_servidor() {
-    cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')%
-    ram_usage=$(free -m | awk 'NR==2{printf "%.2f%", $3*100/$2 }')
+    cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print 100 - $8"%"}')
+    ram_usage=$(free -m | awk 'NR==2{printf "%.2f%", $3*100/$2}')
+    uptime_info=$(uptime -p | sed 's/up //')
     usuarios_online=$(who | wc -l)
     conexoes_ativas=$(netstat -tan | grep ':22 ' | grep ESTABLISHED | wc -l)
 }
@@ -37,6 +41,7 @@ mostrar_painel() {
     echo -e "📊 ${GREEN}Status do Servidor:${NC}"
     echo -e "${BLUE}----------------------------------------${NC}"
     echo -e "🖥️ CPU: ${YELLOW}$cpu_usage${NC}   |  📈 RAM: ${YELLOW}$ram_usage${NC}"
+    echo -e "⏳ Tempo de Atividade: ${YELLOW}$uptime_info${NC}"
     echo -e "🌐 Usuários Online: ${YELLOW}$usuarios_online${NC}"
     echo -e "📡 Conexões Ativas: ${YELLOW}$conexoes_ativas${NC}"
     echo -e "${BLUE}----------------------------------------${NC}"
