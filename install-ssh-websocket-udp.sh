@@ -5,6 +5,7 @@ GREEN="\e[32m"
 RED="\e[31m"
 YELLOW="\e[33m"
 CYAN="\e[36m"
+WHITE="\e[97m"
 RESET="\e[0m"
 
 # Função para exibir o painel principal
@@ -24,7 +25,7 @@ menu() {
 
     # Layout do painel
     echo -e "${CYAN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${RESET}"
-    echo -e "${CYAN}┃            ⇱ VENUS PRO ⇲               ┃${RESET}"
+    echo -e "${CYAN}┃               ⇱ VENUS PRO ⇲               ┃${RESET}"
     echo -e "${CYAN}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫${RESET}"
     echo -e "${CYAN}┃ SISTEMA           MEMORIA RAM       PROCESSADOR  ┃${RESET}"
     echo -e "${CYAN}┃ OS: ${GREEN}$OS${CYAN}  Total: ${GREEN}${RAM_TOTAL}MB${CYAN}   Núcleos: ${GREEN}${CPU_CORES}${CYAN}    ┃${RESET}"
@@ -33,20 +34,20 @@ menu() {
     echo -e "${CYAN}┃ Onlines: ${GREEN}${ONLINE}${CYAN}        Expirados: ${GREEN}${EXPIRED_USERS}${CYAN}      Total: ${GREEN}${TOTAL_USERS}${CYAN}      ┃${RESET}"
     echo -e "${CYAN}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫${RESET}"
 
-    echo -e "${CYAN}┃ [01] • CRIAR USUÁRIO        [13] • SPEEDTEST     ┃${RESET}"
-    echo -e "${CYAN}┃ [02] • CRIAR TESTE          [14] • OTIMIZAR      ┃${RESET}"
-    echo -e "${CYAN}┃ [03] • REMOVER USUÁRIO      [15] • TRÁFEGO       ┃${RESET}"
-    echo -e "${CYAN}┃ [04] • RENOVAR USUÁRIO      [16] • FIREWALL      ┃${RESET}"
-    echo -e "${CYAN}┃ [05] • USUÁRIOS ONLINE      [17] • INFO SISTEMA  ┃${RESET}"
-    echo -e "${CYAN}┃ [06] • ALTERAR DATA         [18] • BANNER        ┃${RESET}"
-    echo -e "${CYAN}┃ [07] • ALTERAR LIMITE       [19] • LIMITAR SSH   ┃${RESET}"
-    echo -e "${CYAN}┃ [08] • ALTERAR SENHA        [20] • BADVPN        ┃${RESET}"
-    echo -e "${CYAN}┃ [09] • REMOVER EXPIRADOS    [21] • AUTO MENU     ┃${RESET}"
-    echo -e "${CYAN}┃ [10] • RELATÓRIO USUÁRIOS   [22] • BOT TELEGRAM  ┃${RESET}"
-    echo -e "${CYAN}┃ [11] • BACKUP DE USUÁRIOS   [23] • FERRAMENTAS   ┃${RESET}"
-    echo -e "${CYAN}┃ [12] • MODO DE CONEXÃO      [00] • SAIR          ┃${RESET}"
-    
+    echo -e "${CYAN}┃ [${RED}01${RESET}] • CRIAR USUÁRIO        [${RED}13${RESET}] • SPEEDTEST     ┃${RESET}"
+    echo -e "${CYAN}┃ [${RED}02${RESET}] • CRIAR TESTE          [${RED}14${RESET}] • OTIMIZAR      ┃${RESET}"
+    echo -e "${CYAN}┃ [${RED}03${RESET}] • REMOVER USUÁRIO      [${RED}15${RESET}] • TRÁFEGO       ┃${RESET}"
+    echo -e "${CYAN}┃ [${RED}04${RESET}] • RENOVAR USUÁRIO      [${RED}16${RESET}] • FIREWALL      ┃${RESET}"
+    echo -e "${CYAN}┃ [${RED}05${RESET}] • USUÁRIOS ONLINE      [${RED}17${RESET}] • INFO SISTEMA  ┃${RESET}"
+    echo -e "${CYAN}┃ [${RED}06${RESET}] • ALTERAR DATA         [${RED}18${RESET}] • BANNER        ┃${RESET}"
+    echo -e "${CYAN}┃ [${RED}07${RESET}] • ALTERAR LIMITE       [${RED}19${RESET}] • LIMITAR SSH   ┃${RESET}"
+    echo -e "${CYAN}┃ [${RED}08${RESET}] • ALTERAR SENHA        [${RED}20${RESET}] • BADVPN        ┃${RESET}"
+    echo -e "${CYAN}┃ [${RED}09${RESET}] • REMOVER EXPIRADOS    [${RED}21${RESET}] • AUTO MENU     ┃${RESET}"
+    echo -e "${CYAN}┃ [${RED}10${RESET}] • RELATÓRIO USUÁRIOS   [${RED}22${RESET}] • BOT TELEGRAM  ┃${RESET}"
+    echo -e "${CYAN}┃ [${RED}11${RESET}] • BACKUP DE USUÁRIOS   [${RED}23${RESET}] • FERRAMENTAS   ┃${RESET}"
+    echo -e "${CYAN}┃ [${RED}12${RESET}] • MODO DE CONEXÃO      [${RED}00${RESET}] • SAIR          ┃${RESET}"
     echo -e "${CYAN}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${RESET}"
+    
     echo -n -e "${CYAN}┗┫ INFORME UMA OPÇÃO: ${RESET}"
     
     read opcao
