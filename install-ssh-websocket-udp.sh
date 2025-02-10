@@ -1,47 +1,64 @@
 #!/bin/bash
 
-# Cores para saída
+# Cores para destaque
 GREEN="\e[32m"
 RED="\e[31m"
 YELLOW="\e[33m"
+CYAN="\e[36m"
 RESET="\e[0m"
 
-# Função do menu
+# Função para exibir o painel principal
 menu() {
     clear
-    echo -e "${YELLOW}========= PAINEL DE GERENCIAMENTO =========${RESET}"
-    echo -e "${GREEN}1. Reiniciar SSH${RESET}"
-    echo -e "${GREEN}2. Reiniciar WebSocket${RESET}"
-    echo -e "${GREEN}3. Abrir uma nova porta UDP${RESET}"
-    echo -e "${GREEN}4. Sair${RESET}"
-    echo -n "Escolha uma opção: "
+
+    # Obtendo informações do sistema
+    OS=$(lsb_release -d | cut -f2-)
+    RAM_TOTAL=$(free -m | awk '/^Mem/ {print $2}')
+    RAM_USO=$(free -m | awk '/^Mem/ {print $3}')
+    CPU_CORES=$(nproc)
+    CPU_USO=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')
+    ONLINE=$(who | wc -l)
+    TOTAL_USERS=$(grep -c '^' /etc/passwd)
+    EXPIRED_USERS=$(find /etc/ -name "shadow" -exec awk -F: '($2=="!!"){print $1}' {} \; | wc -l)
+    HORA=$(date +"%T")
+
+    # Layout do painel
+    echo -e "${CYAN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${RESET}"
+    echo -e "${CYAN}┃            ⇱ VENUS PRO ⇲               ┃${RESET}"
+    echo -e "${CYAN}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫${RESET}"
+    echo -e "${CYAN}┃ SISTEMA           MEMORIA RAM       PROCESSADOR  ┃${RESET}"
+    echo -e "${CYAN}┃ OS: ${GREEN}$OS${CYAN}  Total: ${GREEN}${RAM_TOTAL}MB${CYAN}   Núcleos: ${GREEN}${CPU_CORES}${CYAN}    ┃${RESET}"
+    echo -e "${CYAN}┃ Hora: ${GREEN}${HORA}${CYAN}    Em Uso: ${GREEN}${RAM_USO}MB${CYAN}    CPU: ${GREEN}${CPU_USO}%${CYAN}    ┃${RESET}"
+    echo -e "${CYAN}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫${RESET}"
+    echo -e "${CYAN}┃ Onlines: ${GREEN}${ONLINE}${CYAN}        Expirados: ${GREEN}${EXPIRED_USERS}${CYAN}      Total: ${GREEN}${TOTAL_USERS}${CYAN}      ┃${RESET}"
+    echo -e "${CYAN}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫${RESET}"
+
+    echo -e "${CYAN}┃ [01] • CRIAR USUÁRIO        [13] • SPEEDTEST     ┃${RESET}"
+    echo -e "${CYAN}┃ [02] • CRIAR TESTE          [14] • OTIMIZAR      ┃${RESET}"
+    echo -e "${CYAN}┃ [03] • REMOVER USUÁRIO      [15] • TRÁFEGO       ┃${RESET}"
+    echo -e "${CYAN}┃ [04] • RENOVAR USUÁRIO      [16] • FIREWALL      ┃${RESET}"
+    echo -e "${CYAN}┃ [05] • USUÁRIOS ONLINE      [17] • INFO SISTEMA  ┃${RESET}"
+    echo -e "${CYAN}┃ [06] • ALTERAR DATA         [18] • BANNER        ┃${RESET}"
+    echo -e "${CYAN}┃ [07] • ALTERAR LIMITE       [19] • LIMITAR SSH   ┃${RESET}"
+    echo -e "${CYAN}┃ [08] • ALTERAR SENHA        [20] • BADVPN        ┃${RESET}"
+    echo -e "${CYAN}┃ [09] • REMOVER EXPIRADOS    [21] • AUTO MENU     ┃${RESET}"
+    echo -e "${CYAN}┃ [10] • RELATÓRIO USUÁRIOS   [22] • BOT TELEGRAM  ┃${RESET}"
+    echo -e "${CYAN}┃ [11] • BACKUP DE USUÁRIOS   [23] • FERRAMENTAS   ┃${RESET}"
+    echo -e "${CYAN}┃ [12] • MODO DE CONEXÃO      [00] • SAIR          ┃${RESET}"
+    
+    echo -e "${CYAN}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${RESET}"
+    echo -n -e "${CYAN}┗┫ INFORME UMA OPÇÃO: ${RESET}"
+    
     read opcao
 
     case $opcao in
-        1) 
-            echo -e "${GREEN}Reiniciando SSH...${RESET}"
-            sudo systemctl restart ssh
-            echo -e "${GREEN}SSH reiniciado!${RESET}"
-            ;;
-        2)
-            echo -e "${GREEN}Reiniciando WebSocket...${RESET}"
-            sudo systemctl restart ssh-websocket
-            echo -e "${GREEN}WebSocket reiniciado!${RESET}"
-            ;;
-        3)
-            echo -n "Digite a nova porta UDP para abrir: "
-            read new_udp
-            sudo ufw allow $new_udp/udp
-            sudo ufw reload
-            echo -e "${GREEN}Porta UDP $new_udp liberada!${RESET}"
-            ;;
-        4) 
-            echo -e "${GREEN}Saindo...${RESET}"
-            exit 0
-            ;;
-        *)
-            echo -e "${RED}Opção inválida!${RESET}"
-            ;;
+        1) echo -e "${GREEN}Criando usuário SSH...${RESET}";;
+        2) echo -e "${GREEN}Criando teste SSH...${RESET}";;
+        3) echo -e "${GREEN}Removendo usuário SSH...${RESET}";;
+        4) echo -e "${GREEN}Renovando usuário SSH...${RESET}";;
+        5) echo -e "${GREEN}Listando usuários online...${RESET}";;
+        0) echo -e "${GREEN}Saindo...${RESET}"; exit 0;;
+        *) echo -e "${RED}Opção inválida!${RESET}"; sleep 2; menu;;
     esac
 
     sleep 2
@@ -54,77 +71,10 @@ if [[ "$1" == "menu" ]]; then
     exit 0
 fi
 
-echo -e "${YELLOW}========= INSTALAÇÃO INICIADA =========${RESET}"
-echo -e "${GREEN}1. Atualizando sistema...${RESET}"
-sudo apt update -y && sudo apt upgrade -y
-
-echo -e "${GREEN}2. Instalando OpenSSH...${RESET}"
-sudo apt install -y openssh-server
-
-# Perguntar a porta do SSH
-read -p "Digite a porta TCP para o SSH: " SSH_PORT
-sudo sed -i "s/#Port 22/Port $SSH_PORT/g" /etc/ssh/sshd_config
-sudo systemctl enable ssh
-sudo systemctl restart ssh
-
-echo -e "${GREEN}3. Criando usuário SSH...${RESET}"
-read -p "Digite o nome de usuário SSH: " USERNAME
-read -s -p "Digite a senha para $USERNAME: " PASSWORD
-echo
-sudo useradd -m -s /bin/bash "$USERNAME"
-echo "$USERNAME:$PASSWORD" | sudo chpasswd
-sudo usermod -aG sudo "$USERNAME"
-
-echo -e "${GREEN}4. Instalando WebSocket (websocat)...${RESET}"
-sudo apt install -y wget
-wget -qO /usr/local/bin/websocat https://github.com/vi/websocat/releases/latest/download/websocat_amd64-linux
-chmod +x /usr/local/bin/websocat
-
-read -p "Digite a porta TCP para WebSocket: " WS_PORT
-echo -e "${GREEN}5. Configurando WebSocket...${RESET}"
-cat <<EOF | sudo tee /etc/systemd/system/ssh-websocket.service
-[Unit]
-Description=SSH over WebSocket
-After=network.target
-
-[Service]
-ExecStart=/usr/local/bin/websocat -s $WS_PORT --basic-auth "$USERNAME:$PASSWORD" tcp:localhost:$SSH_PORT
-Restart=always
-User=root
-
-[Install]
-WantedBy=multi-user.target
-EOF
-sudo systemctl daemon-reload
-sudo systemctl enable ssh-websocket
-sudo systemctl restart ssh-websocket
-
-read -p "Deseja abrir uma porta UDP para jogos? (s/n): " OPEN_UDP
-if [[ "$OPEN_UDP" == "s" ]]; then
-    read -p "Digite a porta UDP para abrir: " UDP_PORT
-    echo -e "${GREEN}6. Abrindo porta UDP $UDP_PORT...${RESET}"
-    sudo ufw allow $UDP_PORT/udp
-fi
-
-echo -e "${GREEN}7. Configurando firewall...${RESET}"
-sudo ufw allow $SSH_PORT/tcp
-sudo ufw allow $WS_PORT/tcp
-sudo ufw reload
-
-# Criar o comando "menu" para abrir o painel
-echo -e "${GREEN}8. Criando comando menu...${RESET}"
+# Criar o comando menu globalmente
 echo '#!/bin/bash' | sudo tee /usr/local/bin/menu > /dev/null
 echo "bash <(curl -sL https://raw.githubusercontent.com/Venusofcxp/Venus-ssh/main/install-ssh-websocket-udp.sh) menu" | sudo tee -a /usr/local/bin/menu > /dev/null
 sudo chmod +x /usr/local/bin/menu
 sudo ln -sf /usr/local/bin/menu /usr/bin/menu
 
-IP=$(curl -s ifconfig.me)
-echo -e "${YELLOW}========= INSTALAÇÃO FINALIZADA =========${RESET}"
-echo "Conecte-se via SSH: ssh $USERNAME@$IP -p $SSH_PORT"
-echo "Conecte-se via WebSocket: ws://$IP:$WS_PORT (usuário: $USERNAME, senha: configurada)"
-echo "Para abrir o painel, use o comando: ${GREEN}menu${RESET}"
-if [[ "$OPEN_UDP" == "s" ]]; then
-    echo "Porta UDP liberada: $UDP_PORT"
-fi
-
-exit 0
+echo -e "${GREEN}Instalação concluída! Digite 'menu' para abrir o painel.${RESET}"
