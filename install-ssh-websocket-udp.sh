@@ -18,47 +18,82 @@ NC='\033[0m' # Sem cor
     exit 1
 }
 
-# - Instala dependências
-apt update -y && apt install -y bc sysstat procps net-tools
-
-# - Função para obter status do sistema
+# - Função para obter status do sistema em tempo real
 status_servidor() {
-    cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print 100 - $8"%"}')
-    ram_usage=$(free -m | awk 'NR==2{printf "%.2f%", $3*100/$2}')
-    uptime_info=$(uptime -p | sed 's/up //')
-    usuarios_online=$(who | wc -l)
-    conexoes_ativas=$(netstat -tan | grep ':22 ' | grep ESTABLISHED | wc -l)
-}
+    while true; do
+        clear
+        # CPU - Calculando uso corretamente
+        cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print 100 - $8"%"}')
 
-# - Exibir painel VENUS PRO
-mostrar_painel() {
-    clear
-    status_servidor
-    echo -e "${BLUE}========================================${NC}"
-    echo -e "          🌟 ${YELLOW}VENUS PRO${NC} 🌟        "
-    echo -e "${BLUE}========================================${NC}"
-    echo -e ""
-    echo -e "📊 ${GREEN}Status do Servidor:${NC}"
-    echo -e "${BLUE}----------------------------------------${NC}"
-    echo -e "🖥️ CPU: ${YELLOW}$cpu_usage${NC}   |  📈 RAM: ${YELLOW}$ram_usage${NC}"
-    echo -e "⏳ Tempo de Atividade: ${YELLOW}$uptime_info${NC}"
-    echo -e "🌐 Usuários Online: ${YELLOW}$usuarios_online${NC}"
-    echo -e "📡 Conexões Ativas: ${YELLOW}$conexoes_ativas${NC}"
-    echo -e "${BLUE}----------------------------------------${NC}"
-    echo -e ""
-    echo -e "📌 ${GREEN}MENU PRINCIPAL:${NC}"
-    echo -e "${BLUE}----------------------------------------${NC}"
-    echo -e "[${YELLOW}1${NC}] 🛠️ Gerenciar Usuários"
-    echo -e "[${YELLOW}2${NC}] 🔌 Configurações de Rede"
-    echo -e "[${YELLOW}3${NC}] 📶 Status da Conexão"
-    echo -e "[${YELLOW}4${NC}] ⚙️ Ferramentas Extras"
-    echo -e "[${YELLOW}5${NC}] 📜 Logs e Registros"
-    echo -e "[${YELLOW}6${NC}] 🏆 Estatísticas"
-    echo -e "[${YELLOW}7${NC}] 🖥️ Monitoramento"
-    echo -e "[${YELLOW}8${NC}] 🔄 Reiniciar Servidor"
-    echo -e "[${YELLOW}9${NC}] ❌ Sair"
-    echo -e "${BLUE}----------------------------------------${NC}"
-    echo -e "💡 ${YELLOW}Dica: Digite o número da opção desejada.${NC}"
+        # RAM - Evitando erro de divisão por zero
+        ram_info=$(free -m | awk 'NR==2')
+        ram_total=$(echo "$ram_info" | awk '{print $2}')
+        ram_usada=$(echo "$ram_info" | awk '{print $3}')
+        ram_usage=$(awk -v usada="$ram_usada" -v total="$ram_total" 'BEGIN {if (total > 0) printf "%.2f%", (usada/total)*100}')
+
+        # Tempo de atividade
+        tempo_ativo=$(uptime -p)
+
+        # Conexões e usuários
+        usuarios_online=$(who | wc -l)
+        conexoes_ativas=$(netstat -tan | grep ':22 ' | grep ESTABLISHED | wc -l)
+
+        # Exibir painel VENUS PRO
+        echo -e "${BLUE}========================================${NC}"
+        echo -e "          🌟 ${YELLOW}VENUS PRO${NC} 🌟        "
+        echo -e "${BLUE}========================================${NC}"
+        echo -e ""
+        echo -e "📊 ${GREEN}Status do Servidor:${NC}"
+        echo -e "${BLUE}----------------------------------------${NC}"
+        echo -e "🖥️ CPU: ${YELLOW}$cpu_usage${NC}   |  📈 RAM: ${YELLOW}$ram_usage${NC}"
+        echo -e "⏳ Tempo ativo: ${YELLOW}$tempo_ativo${NC}"
+        echo -e "🌐 Usuários Online: ${YELLOW}$usuarios_online${NC}"
+        echo -e "📡 Conexões Ativas: ${YELLOW}$conexoes_ativas${NC}"
+        echo -e "${BLUE}----------------------------------------${NC}"
+        echo -e ""
+        echo -e "📌 ${GREEN}MENU PRINCIPAL:${NC}"
+        echo -e "${BLUE}----------------------------------------${NC}"
+        echo -e "[${YELLOW}1${NC}] 🛠️ Gerenciar Usuários"
+        echo -e "[${YELLOW}2${NC}] 🔌 Configurações de Rede"
+        echo -e "[${YELLOW}3${NC}] 📶 Status da Conexão"
+        echo -e "[${YELLOW}4${NC}] ⚙️ Ferramentas Extras"
+        echo -e "[${YELLOW}5${NC}] 📜 Logs e Registros"
+        echo -e "[${YELLOW}6${NC}] 🏆 Estatísticas"
+        echo -e "[${YELLOW}7${NC}] 🖥️ Monitoramento"
+        echo -e "[${YELLOW}8${NC}] 🔄 Reiniciar Servidor"
+        echo -e "[${YELLOW}9${NC}] ❌ Sair"
+        echo -e "${BLUE}----------------------------------------${NC}"
+        echo -e "💡 ${YELLOW}Dica: Digite o número da opção desejada.${NC}"
+
+        read -t 5 -p "Escolha uma opção: " opcao
+        [[ -z "$opcao" ]] && continue  # Se não escolher nada, continua atualizando
+
+        case "$opcao" in
+            1) 
+                clear
+                echo -e "${GREEN}[1] Criar Usuário SSH${NC}"
+                echo -e "${GREEN}[2] Remover Usuário SSH${NC}"
+                echo -e "${GREEN}[3] Listar Usuários SSH${NC}"
+                read -p "Escolha uma opção: " sub_opcao
+                case "$sub_opcao" in
+                    1) criar_usuario ;;
+                    2) remover_usuario ;;
+                    3) listar_usuarios ;;
+                    *) echo -e "${RED}[x] Opção inválida!${NC}" ;;
+                esac
+                ;;
+            2) configurar_ssh ;;
+            3) ver_conexoes ;;
+            4) echo -e "${YELLOW}[!] Em desenvolvimento...${NC}" ;;
+            5) echo -e "${YELLOW}[!] Em desenvolvimento...${NC}" ;;
+            6) echo -e "${YELLOW}[!] Em desenvolvimento...${NC}" ;;
+            7) echo -e "${YELLOW}[!] Em desenvolvimento...${NC}" ;;
+            8) reiniciar_servidor ;;
+            9) echo -e "${GREEN}Saindo...${NC}"; exit ;;
+            *) echo -e "${RED}[x] Opção inválida!${NC}" ;;
+        esac
+        read -p "Pressione ENTER para continuar..."
+    done
 }
 
 # - Funções do Gerenciador SSH
@@ -105,34 +140,5 @@ reiniciar_servidor() {
     reboot
 }
 
-# - Loop do Menu Principal
-while true; do
-    mostrar_painel
-    read -p "Escolha uma opção: " opcao
-
-    case "$opcao" in
-        1) 
-            clear
-            echo -e "${GREEN}[1] Criar Usuário SSH${NC}"
-            echo -e "${GREEN}[2] Remover Usuário SSH${NC}"
-            echo -e "${GREEN}[3] Listar Usuários SSH${NC}"
-            read -p "Escolha uma opção: " sub_opcao
-            case "$sub_opcao" in
-                1) criar_usuario ;;
-                2) remover_usuario ;;
-                3) listar_usuarios ;;
-                *) echo -e "${RED}[x] Opção inválida!${NC}" ;;
-            esac
-            ;;
-        2) configurar_ssh ;;
-        3) ver_conexoes ;;
-        4) echo -e "${YELLOW}[!] Em desenvolvimento...${NC}" ;;
-        5) echo -e "${YELLOW}[!] Em desenvolvimento...${NC}" ;;
-        6) echo -e "${YELLOW}[!] Em desenvolvimento...${NC}" ;;
-        7) echo -e "${YELLOW}[!] Em desenvolvimento...${NC}" ;;
-        8) reiniciar_servidor ;;
-        9) echo -e "${GREEN}Saindo...${NC}"; exit ;;
-        *) echo -e "${RED}[x] Opção inválida!${NC}" ;;
-    esac
-    read -p "Pressione ENTER para continuar..."
-done
+# Iniciar o painel atualizado
+status_servidor
