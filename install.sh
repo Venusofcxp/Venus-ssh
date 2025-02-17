@@ -18,7 +18,7 @@ mkdir -p bot_iptv
 cd bot_iptv
 
 # Clonando o repositório do GitHub (substitua pelo seu repositório)
-git clone https://github.com/seuusuario/seurepositorio.git .
+git clone https://raw.githubusercontent.com/Venusofcxp/Venus-ssh/refs/heads/main/bot_iptv.py .
 
 # Instalando as dependências do Python
 pip3 install -r requirements.txt
