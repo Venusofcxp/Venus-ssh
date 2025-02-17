@@ -2,7 +2,7 @@
 
 # Definições
 PASTA_INSTALACAO="/root/listas_iptv"
-SCRIPT_URL=""
+SCRIPT_URL="https://raw.githubusercontent.com/Venusofcxp/Venus-ssh/refs/heads/main/bot_iptv.py"
 SCRIPT_NOME="bot_iptv.py"
 
 echo "🔧 Instalador IPTV - Iniciando instalação..."
