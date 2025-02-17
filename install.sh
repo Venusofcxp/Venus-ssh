@@ -17,7 +17,7 @@ echo "Clonando o repositório do GitHub..."
 git clone https://raw.githubusercontent.com/Venusofcxp/Venus-ssh/refs/heads/main/bot_iptv.py
 
 # Navegando até o diretório do projeto
-cd /root/iptv-bot
+cd /root/bot_iptv.py
 
 # Configurando o arquivo de ambiente (como o IP da VPS)
 echo "Atualizando configurações no script Python..."
