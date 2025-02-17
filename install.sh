@@ -14,7 +14,7 @@ pip3 install flask python-telegram-bot requests
 
 # Baixando o script do GitHub
 echo "Clonando o repositório do GitHub..."
-git clone https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git /root/iptv-bot
+git clone https://raw.githubusercontent.com/Venusofcxp/Venus-ssh/refs/heads/main/M%C3%B3dulo/Bot.py
 
 # Navegando até o diretório do projeto
 cd /root/iptv-bot
